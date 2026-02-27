@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Form() {
+export default function Form({ getStudents }) {
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -17,11 +17,17 @@ export default function Form() {
 
     const data = await response.json();
     console.log(data);
+
+    // Refresh the student list after submission
+    getStudents();
+
+    // Clear the form
+    e.target.reset();
   }
   return (
-    <div onSubmit={handleSubmit}>
+    <div>
       <h2>Form</h2>
-      <form>
+      <form onSubmit={handleSubmit}>
         <input type="text" placeholder="Name" />
         <br />
         <input type="number" placeholder="Age" />

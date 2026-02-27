@@ -25,7 +25,7 @@ function App() {
         );
       })}
 
-      <Form />
+      <Form getStudents={getStudents} />
     </div>
   );
 }
