@@ -2,45 +2,64 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 
+const { Sequelize } = require('sequelize');
+const databaseCon = require('./db/dbCon');
+const Student = require('./db/Student');
+
 // middleware for json
 app.use(express.json());
 
 //implement cors
 app.use(cors());
 
-const students = [
-    {
-        id: 0,
-        name: "Gihan",
-        age: 13
-    }, {
-        id: 1,
-        name: "John",
-        age: 15
-    }
-]
+databaseCon.sync({alter:true});
 
-app.get("/students", (req, res) => {
-    res.json(students);
+// const students = [
+//     {
+//         id: 0,
+//         name: "Gihan",
+//         age: 13
+//     }, {
+//         id: 1,
+//         name: "John",
+//         age: 15
+//     }
+// ]
+
+app.get("/students", async (req, res) => {
+    try {
+        const students = await Student.findAll();
+        res.json(students);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 })
 
 app.post("/students", (req, res) => {
     const { name, age } = req.body;
-    students.push({ id: students.length, name, age });
+    Student.create({ name, age });
     res.json({ message: "Student added successfully" });
 });
 
-app.delete("/students/:id", (req, res) => {
+app.delete("/students/:id", async (req, res) => {
     const id = req.params.id;
-    students.splice(id, 1);
-    res.json({ message: "Student deleted " });
+    try {
+        await Student.destroy({ where: { id } });
+        res.json({ message: "Student deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 })
 
-app.put("/students/:id", (req, res) => {
+app.put("/students/:id", async (req, res) => {
     const id = req.params.id;
     const { name, age } = req.body;
-    students[id] = { id: parseInt(id), name, age };
-    res.json({ message: "Student updated " });
+    try {
+        await Student.update({ name, age }, { where: { id } });
+        res.json({ message: "Student updated successfully" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 })
 
 
